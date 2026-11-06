@@ -1,0 +1,34 @@
+---
+// Viewport-triggered reveal wrapper powered by the motion lifecycle in `src/animations`.
+// Renders a plain container when JavaScript is unavailable or reduced motion is requested.
+type Props = {
+  as?: 'div' | 'span' | 'section' | 'article' | 'header' | 'footer' | 'li'
+  direction?: 'up' | 'down' | 'left' | 'right'
+  distance?: number
+  duration?: number
+  delay?: number
+  class?: string
+}
+
+const {
+  as = 'div',
+  direction = 'up',
+  distance = 24,
+  duration,
+  delay,
+  class: className,
+} = Astro.props
+
+const Tag = as
+---
+
+<Tag
+  class:list={[className]}
+  data-motion="reveal"
+  data-motion-direction={direction}
+  data-motion-distance={distance}
+  data-motion-duration={duration}
+  data-motion-delay={delay}
+>
+  <slot />
+</Tag>

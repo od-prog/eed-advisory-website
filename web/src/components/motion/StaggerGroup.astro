@@ -1,0 +1,23 @@
+---
+// Reveals its direct child elements in sequence when scrolled into view.
+type Props = {
+  stagger?: number
+  duration?: number
+  delay?: number
+  distance?: number
+  class?: string
+}
+
+const { stagger, duration, delay, distance, class: className } = Astro.props
+---
+
+<div
+  class:list={[className]}
+  data-motion="stagger"
+  data-motion-stagger={stagger}
+  data-motion-duration={duration}
+  data-motion-delay={delay}
+  data-motion-distance={distance}
+>
+  <slot />
+</div>

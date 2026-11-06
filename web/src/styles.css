@@ -10,6 +10,15 @@
   --color-neutral-150: #ededed;
 }
 
+:root {
+  --motion-duration-fast: 180ms;
+  --motion-duration-standard: 350ms;
+  --motion-duration-slow: 650ms;
+  --motion-duration-cinematic: 1000ms;
+  --motion-stagger: 80ms;
+  --motion-distance: 24px;
+}
+
 @layer base {
   html {
     /* Scroll offset to account for the fixed header */
@@ -33,6 +42,26 @@
 
   .header-transparent {
     @apply bg-transparent;
+  }
+
+  /* Motion groundwork: elements are only hidden when JavaScript is available
+     and the visitor has not requested reduced motion. */
+  .motion-word {
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-js [data-motion~='reveal'] {
+      opacity: 0;
+    }
+
+    .motion-js [data-motion~='stagger'] > * {
+      opacity: 0;
+    }
+
+    .motion-js [data-motion~='text-reveal'] .motion-word {
+      opacity: 0;
+    }
   }
 
   .menu-icon {

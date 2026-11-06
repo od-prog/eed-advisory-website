@@ -1,0 +1,31 @@
+---
+// Sequential word-by-word headline reveal.
+// The slot is split into word spans at build time, so the slot content must be plain text.
+// With JavaScript unavailable or reduced motion requested, the words render statically.
+type Props = {
+  as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span'
+  duration?: number
+  stagger?: number
+  delay?: number
+  class?: string
+}
+
+const { as = 'h2', duration, stagger, delay, class: className } = Astro.props
+
+const slotHtml = await Astro.slots.render('default')
+const words = slotHtml.length > 0 ? slotHtml.replace(/\s+/g, ' ').trim().split(' ') : []
+const markup = words
+  .map((word, index) => `<span class="motion-word" style="--motion-index:${index}">${word}</span>`)
+  .join(' ')
+
+const Tag = as
+---
+
+<Tag
+  class:list={[className]}
+  data-motion="text-reveal"
+  data-motion-duration={duration}
+  data-motion-stagger={stagger}
+  data-motion-delay={delay}
+  set:html={markup}
+/>
