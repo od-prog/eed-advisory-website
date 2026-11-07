@@ -59,10 +59,16 @@ function animateIn(element: HTMLElement): void {
   definition.init(element, motionContext)
 }
 
+const observedElements = new WeakSet<HTMLElement>()
+
 function setupBehaviors(): void {
   for (const element of document.querySelectorAll<HTMLElement>('[data-behavior]')) {
+    if (element.dataset.behaviorState !== undefined) {
+      continue
+    }
     const behavior = getBehaviorDefinition(element.dataset.behavior ?? '')
     if (behavior) {
+      element.dataset.behaviorState = 'active'
       const cleanup = behavior(element)
       if (cleanup) {
         pageCleanups.push(cleanup)
@@ -72,8 +78,11 @@ function setupBehaviors(): void {
 }
 
 function setupMotion(): void {
+  // Behavior/motion definitions may still be registering when this runs for the
+  // first time (initial load race). Re-running is safe: motion elements are guarded
+  // by `data-motion-state`, behaviors by `data-behavior-state`.
   const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-motion]')).filter(
-    (element) => element.dataset.motionState === undefined,
+    (element) => element.dataset.motionState === undefined && !observedElements.has(element),
   )
 
   if (prefersReducedMotion()) {
@@ -93,6 +102,7 @@ function setupMotion(): void {
           }
           observerInstance.unobserve(entry.target)
           if (entry.target instanceof HTMLElement) {
+            observedElements.delete(entry.target)
             animateIn(entry.target)
           }
         }
@@ -101,6 +111,7 @@ function setupMotion(): void {
     )
     pageObservers.push(observer)
     for (const element of elements) {
+      observedElements.add(element)
       observer.observe(element)
     }
   }
@@ -124,6 +135,14 @@ export function initialiseMotionLifecycle(): void {
     }
     teardown()
   })
+
+  // Fallback for the initial load: `astro:page-load` fires once the client router
+  // is ready and may happen before this module finished loading (e.g. dev bundling).
+  if (document.readyState !== 'loading') {
+    requestAnimationFrame(setupMotion)
+  } else {
+    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(setupMotion))
+  }
 }
 
 initialiseMotionLifecycle()

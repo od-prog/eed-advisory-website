@@ -1,3 +1,5 @@
+import './lifecycle'
+
 export { prefersReducedMotion } from './preferences'
 export {
   getBehaviorDefinition,
