@@ -44,13 +44,11 @@
     @apply bg-transparent;
   }
 
-  /* Motion groundwork: elements are only hidden when JavaScript is available
-     and the visitor has not requested reduced motion. */
-  .motion-word {
-    display: inline-block;
-  }
-
   @media (prefers-reduced-motion: no-preference) {
+    .motion-js [data-motion~='text-reveal'] .motion-word {
+      display: inline-block;
+    }
+
     .motion-js [data-motion~='reveal'] {
       opacity: 0;
     }
@@ -59,8 +57,17 @@
       opacity: 0;
     }
 
+    .motion-js [data-motion~='text-reveal'][data-motion-state='done'] .motion-word {
+      opacity: 1;
+    }
+
     .motion-js [data-motion~='text-reveal'] .motion-word {
       opacity: 0;
+    }
+
+    .motion-js [data-motion~='stagger'][data-motion-state='done'] > *,
+    .motion-js [data-motion~='reveal'][data-motion-state='done'] {
+      opacity: 1;
     }
   }
 

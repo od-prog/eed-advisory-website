@@ -1,22 +1,33 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from "@playwright/test";
 
-const runE2E = process.env.E2E === '1'
+const isCI = Boolean(process.env.CI);
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   fullyParallel: true,
-  ...(runE2E
-    ? {
-        webServer: {
-          command: 'pnpm --filter web dev',
-          url: 'http://localhost:4321',
-          reuseExistingServer: true,
-          timeout: 120_000,
-        },
-      }
-    : {}),
-  use: {
-    ...(runE2E ? { baseURL: 'http://localhost:4321' } : {}),
-    ...devices['Desktop Chrome'],
+  timeout: 30_000,
+  expect: { timeout: 5_000 },
+  retries: isCI ? 2 : 0,
+  reporter: [
+    ["list"],
+    ["html", { outputFolder: "playwright-report", open: "never" }],
+  ],
+  outputDir: "test-results",
+  webServer: {
+    command: "pnpm --filter web exec astro dev --host 127.0.0.1 --port 4322",
+    url: "http://127.0.0.1:4322/e2e-fixtures/motion",
+    reuseExistingServer: !isCI,
+    timeout: 120_000,
+    env: {
+      WEBSITE_URL: "http://127.0.0.1:4322",
+      CMS_URL: "http://127.0.0.1:3000",
+      CMS_API_KEY: "",
+      PREVIEW_SECRET: "motion-e2e-placeholder",
+      VERCEL_ENV: "development",
+    },
   },
-})
+  use: {
+    baseURL: "http://127.0.0.1:4322",
+    ...devices["Desktop Chrome"],
+  },
+});

@@ -1,6 +1,9 @@
 export type RevealDirection = 'up' | 'down' | 'left' | 'right'
 
-export const motionDefaults = {
+// CSS custom properties are the runtime source for duration, stagger, and distance.
+// These fallback values cover cases where the stylesheet is not available; delay
+// and ease intentionally remain component-independent defaults.
+const fallbackDefaults = {
   durationMs: 650,
   delayMs: 0,
   staggerMs: 80,
@@ -25,6 +28,15 @@ function readNumber(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback
 }
 
+function readToken(element: HTMLElement, token: string, fallback: number): number {
+  const value = getComputedStyle(element).getPropertyValue(token).trim()
+  const match = /^(\d+(?:\.\d+)?)(ms|s|px)?$/.exec(value)
+  if (!match) return fallback
+  const amount = Number(match[1])
+  const unit = match[2]
+  return unit === 's' ? amount * 1000 : amount
+}
+
 function readDirection(value: string | undefined): RevealDirection {
   if (value === 'up' || value === 'down' || value === 'left' || value === 'right') {
     return value
@@ -33,13 +45,16 @@ function readDirection(value: string | undefined): RevealDirection {
 }
 
 export function readMotionOptions(element: HTMLElement): MotionOptions {
+  const durationDefault = readToken(element, '--motion-duration-slow', fallbackDefaults.durationMs)
+  const staggerDefault = readToken(element, '--motion-stagger', fallbackDefaults.staggerMs)
+  const distanceDefault = readToken(element, '--motion-distance', fallbackDefaults.distancePx)
   return {
-    durationMs: readNumber(element.dataset.motionDuration, motionDefaults.durationMs),
-    delayMs: readNumber(element.dataset.motionDelay, motionDefaults.delayMs),
-    staggerMs: readNumber(element.dataset.motionStagger, motionDefaults.staggerMs),
-    distancePx: readNumber(element.dataset.motionDistance, motionDefaults.distancePx),
+    durationMs: readNumber(element.dataset.motionDuration, durationDefault),
+    delayMs: readNumber(element.dataset.motionDelay, fallbackDefaults.delayMs),
+    staggerMs: readNumber(element.dataset.motionStagger, staggerDefault),
+    distancePx: readNumber(element.dataset.motionDistance, distanceDefault),
     direction: readDirection(element.dataset.motionDirection),
-    ease: motionDefaults.ease,
+    ease: fallbackDefaults.ease,
   }
 }
 

@@ -1,6 +1,6 @@
 import { prefersReducedMotion } from './preferences'
 import type { MotionContext } from './registry'
-import { getBehaviorDefinition, getMotionDefinition } from './registry'
+import { getBehaviorDefinition, getMotionDefinition, onRegistration } from './registry'
 import './reveal'
 import './text'
 
@@ -30,6 +30,7 @@ function teardown(): void {
   for (const observer of pageObservers.splice(0)) {
     observer.disconnect()
   }
+  observedElements.clear()
   for (const cleanup of pageCleanups.splice(0)) {
     cleanup()
   }
@@ -56,10 +57,20 @@ function animateIn(element: HTMLElement): void {
     element.dataset.motionState = 'done'
     return
   }
-  definition.init(element, motionContext)
+  try {
+    definition.init(element, motionContext)
+  } catch {
+    element.querySelectorAll<HTMLElement | SVGElement>('*').forEach((child) => {
+      child.style.removeProperty('opacity')
+      child.style.removeProperty('transform')
+    })
+    element.style.removeProperty('opacity')
+    element.style.removeProperty('transform')
+    element.dataset.motionState = 'done'
+  }
 }
 
-const observedElements = new WeakSet<HTMLElement>()
+const observedElements = new Set<HTMLElement>()
 
 function setupBehaviors(): void {
   for (const element of document.querySelectorAll<HTMLElement>('[data-behavior]')) {
@@ -82,7 +93,10 @@ function setupMotion(): void {
   // first time (initial load race). Re-running is safe: motion elements are guarded
   // by `data-motion-state`, behaviors by `data-behavior-state`.
   const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-motion]')).filter(
-    (element) => element.dataset.motionState === undefined && !observedElements.has(element),
+    (element) =>
+      element.dataset.motionState === undefined &&
+      !observedElements.has(element) &&
+      getMotionDefinition(element.dataset.motion ?? '') !== undefined,
   )
 
   if (prefersReducedMotion()) {
@@ -127,6 +141,11 @@ export function initialiseMotionLifecycle(): void {
   }
   animationModuleInitialised = true
 
+  document.documentElement.classList.add('motion-js')
+  onRegistration(() => {
+    if (document.readyState !== 'loading') setupMotion()
+  })
+
   document.addEventListener('astro:page-load', setupMotion)
 
   document.addEventListener('astro:before-swap', (event) => {
@@ -136,12 +155,12 @@ export function initialiseMotionLifecycle(): void {
     teardown()
   })
 
-  // Fallback for the initial load: `astro:page-load` fires once the client router
-  // is ready and may happen before this module finished loading (e.g. dev bundling).
-  if (document.readyState !== 'loading') {
-    requestAnimationFrame(setupMotion)
+  // Set up once the DOM is ready. Registry notifications handle definitions that
+  // are registered after this initial pass without polling or retry loops.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMotion, { once: true })
   } else {
-    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(setupMotion))
+    setupMotion()
   }
 }
 

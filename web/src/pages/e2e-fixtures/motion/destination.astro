@@ -1,0 +1,30 @@
+---
+if (!import.meta.env.DEV) return new Response(null, { status: 404 })
+
+import { ClientRouter } from 'astro:transitions'
+import '../../../styles.css'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <ClientRouter />
+    <script>
+      import '../../../animations'
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Test navigation">
+        <a href="/e2e-fixtures/motion">Motion fixture</a>
+        <a href="/e2e-fixtures/motion/destination">Known destination</a>
+      </nav>
+    </header>
+    <main>
+      <h1>Motion fixture destination</h1>
+      <p>This deterministic destination verifies a full Astro page transition.</p>
+    </main>
+  </body>
+</html>

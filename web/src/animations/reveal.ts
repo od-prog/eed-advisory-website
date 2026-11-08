@@ -43,9 +43,7 @@ export function initReveal(element: HTMLElement, context: MotionContext): void {
 
 export function initStagger(element: HTMLElement, context: MotionContext): void {
   const options = readMotionOptions(element)
-  const targets = Array.from(element.children).filter(
-    (child): child is HTMLElement => child instanceof HTMLElement,
-  )
+  const targets = Array.from(element.children)
 
   element.dataset.motionState = 'active'
 
@@ -60,22 +58,32 @@ export function initStagger(element: HTMLElement, context: MotionContext): void 
     return
   }
 
-  gsap.set(targets, { y: options.distancePx, opacity: 0 })
+  try {
+    gsap.set(targets, { y: options.distancePx, opacity: 0 })
 
-  const tween = gsap.to(targets, {
-    y: 0,
-    opacity: 1,
-    duration: seconds(options.durationMs),
-    delay: seconds(options.delayMs),
-    stagger: seconds(options.staggerMs),
-    ease: options.ease,
-    overwrite: 'auto',
-    onComplete: () => {
-      element.dataset.motionState = 'done'
-    },
-  })
+    const tween = gsap.to(targets, {
+      y: 0,
+      opacity: 1,
+      duration: seconds(options.durationMs),
+      delay: seconds(options.delayMs),
+      stagger: seconds(options.staggerMs),
+      ease: options.ease,
+      overwrite: 'auto',
+      onComplete: () => {
+        element.dataset.motionState = 'done'
+      },
+    })
 
-  context.registerTween(tween)
+    context.registerTween(tween)
+  } catch {
+    for (const target of targets) {
+      if (target instanceof HTMLElement || target instanceof SVGElement) {
+        target.style.opacity = '1'
+        target.style.removeProperty('transform')
+      }
+    }
+    element.dataset.motionState = 'done'
+  }
 }
 
 registerMotion('reveal', { init: initReveal })
