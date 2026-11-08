@@ -22,6 +22,7 @@ const homePagePath = normalizePath(`/${locale ?? defaultLocale}`, preview)
 <header
   class:list={['fixed z-40 flex w-full items-center justify-between px-4 py-4 md:px-12']}
   id="header"
+  data-behavior="header"
 >
   <a href={homePagePath} class="flex items-center gap-2 text-2xl font-bold">
     {websiteConfig.name}
@@ -125,20 +126,24 @@ const homePagePath = normalizePath(`/${locale ?? defaultLocale}`, preview)
 </section>
 
 <script>
-  function setupHeader() {
-    const modalButton = document.getElementById('menu-icon')
-    const modal = document.getElementById('navbar-modal')
-    const header = document.getElementById('header')
+  import { registerBehavior } from '../animations/registry'
 
-    if (!modalButton || !modal || !header) {
-      throw new Error('Missing elements')
+  registerBehavior('header', (header) => {
+    const modalButton = header.querySelector<HTMLButtonElement>('#menu-icon')
+    const modal = document.getElementById('navbar-modal')
+    const intercept = document.createElement('div')
+
+    if (!modalButton || !modal) {
+      return () => {}
     }
 
-    const intercept = document.createElement('div')
     intercept.setAttribute('data-observer-intercept', '')
     header.before(intercept)
 
     const observer = new IntersectionObserver(([entry]) => {
+      if (!entry) {
+        return
+      }
       header.classList.toggle('header-scrolled', !entry.isIntersecting)
       header.classList.toggle('header-transparent', entry.isIntersecting)
       document.body.classList.toggle('scrolled', !entry.isIntersecting)
@@ -149,56 +154,62 @@ const homePagePath = normalizePath(`/${locale ?? defaultLocale}`, preview)
     const animateInClasses = ['animate-in', 'slide-in-from-top-5', 'fade-in', 'duration-300']
     const animateOutClasses = ['animate-out', 'slide-out-to-top-5', 'fade-out', 'duration-300']
 
-    modalButton?.addEventListener('click', () => {
+    const closeModal = () => {
+      modalButton.classList.remove('active')
+      modalButton.setAttribute('aria-expanded', 'false')
+      modalButton.setAttribute('aria-label', modalButton.dataset.labelOpen ?? '')
+      modal?.classList.add(...animateOutClasses)
+
+      header.classList.add(
+        document.body.classList.contains('scrolled') ? 'header-scrolled' : 'header-transparent',
+      )
+
+      setTimeout(() => {
+        modal?.classList.add('hidden')
+        modal?.classList.remove(...animateOutClasses)
+      }, 300)
+
+      document.body.style.overflow = 'auto'
+    }
+
+    const openModal = () => {
+      modal?.style.setProperty('top', `${header.clientHeight}px`)
+      modal?.style.setProperty('height', `${window.innerHeight - header.clientHeight}px`)
+
+      modalButton.classList.add('active')
+      modalButton.setAttribute('aria-expanded', 'true')
+      modalButton.setAttribute('aria-label', modalButton.dataset.labelClose ?? '')
+      modal?.classList.remove('hidden')
+      modal?.classList.add(...animateInClasses)
+
+      header.classList.remove('header-transparent')
+      header.classList.add(
+        document.body.classList.contains('scrolled') ? 'header-scrolled' : 'header-solid',
+      )
+
+      setTimeout(() => {
+        modal?.classList.remove(...animateInClasses)
+      }, 300)
+
+      document.body.style.overflow = 'hidden'
+    }
+
+    const onToggle = () => {
       if (modalButton.classList.contains('active')) {
-        // close modal
-        modalButton.classList.remove('active')
-        modalButton.setAttribute('aria-expanded', 'false')
-        modalButton.setAttribute('aria-label', modalButton.dataset.labelOpen!)
-        modal?.classList.add(...animateOutClasses)
-
-        // reset header styles
-        header.classList.add(
-          document.body.classList.contains('scrolled') ? 'header-scrolled' : 'header-transparent',
-        )
-
-        // Wait for animation to complete before hiding
-        setTimeout(() => {
-          modal?.classList.add('hidden')
-          modal?.classList.remove(...animateOutClasses)
-        }, 300)
-
-        // enable page scrolling
-        document.body.style.overflow = 'auto'
+        closeModal()
       } else {
-        modal?.style.setProperty('top', `${header.clientHeight}px`)
-        modal?.style.setProperty('height', `${window.innerHeight - header.clientHeight}px`)
-
-        // open modal
-        modalButton.classList.add('active')
-        modalButton.setAttribute('aria-expanded', 'true')
-        modalButton.setAttribute('aria-label', modalButton.dataset.labelClose!)
-        modal?.classList.remove('hidden')
-        modal?.classList.add(...animateInClasses)
-
-        // set header styles
-        header.classList.remove('header-transparent')
-        header.classList.add(
-          document.body.classList.contains('scrolled') ? 'header-scrolled' : 'header-solid',
-        )
-
-        // Remove animation classes after animation completes
-        setTimeout(() => {
-          modal?.classList.remove(...animateInClasses)
-        }, 300)
-
-        // disable page scrolling
-        document.body.style.overflow = 'hidden'
+        openModal()
       }
-    })
-  }
+    }
 
-  // Run setup function on the initial and any subsequent page loads due to navigation
-  // https://docs.astro.build/en/guides/view-transitions/#astropage-load
-  document.addEventListener('astro:page-load', setupHeader)
+    modalButton.addEventListener('click', onToggle)
+
+    return () => {
+      observer.disconnect()
+      modalButton.removeEventListener('click', onToggle)
+      modalButton.classList.remove('active')
+      modalButton.setAttribute('aria-expanded', 'false')
+      document.body.style.overflow = 'auto'
+    }
+  })
 </script>

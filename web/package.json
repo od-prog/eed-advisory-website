@@ -23,6 +23,7 @@
     "astro": "^7.4.4",
     "astro-seo-schema": "^7.0.1",
     "cms": "workspace:*",
+    "gsap": "^3.15.1",
     "payload": "3.92.1",
     "schema-dts": "^2.1.0"
   },

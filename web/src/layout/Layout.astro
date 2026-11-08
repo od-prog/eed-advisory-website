@@ -28,6 +28,9 @@ const enablePlausible = VERCEL_ENV === 'production' && !preview
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    <script is:inline>
+      document.documentElement.classList.add('motion-js')
+    </script>
 
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
@@ -53,6 +56,9 @@ const enablePlausible = VERCEL_ENV === 'production' && !preview
     )}
 
     <ClientRouter />
+    <script>
+      import '../animations'
+    </script>
   </head>
   <body>
     <Header alternatePaths={meta.alternatePaths} />
