@@ -1,0 +1,62 @@
+---
+if (!import.meta.env.DEV) return new Response(null, { status: 404 })
+
+import { ClientRouter } from 'astro:transitions'
+import '../../styles.css'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <ClientRouter />
+    <script>
+      import '../../animations'
+      import { initialiseMotionLifecycle } from '../../animations/lifecycle'
+      import { registerBehavior, registerMotion } from '../../animations/registry'
+
+      const fixtureWindow = window as Window & {
+        __initialiseMotionLifecycle?: typeof initialiseMotionLifecycle
+        __registerMotion?: typeof registerMotion
+      }
+      fixtureWindow.__initialiseMotionLifecycle = initialiseMotionLifecycle
+      fixtureWindow.__registerMotion = registerMotion
+
+      registerBehavior('fixture-cleanup', (element) => {
+        const mark = () => element.setAttribute('data-listener-active', 'true')
+        window.addEventListener('resize', mark)
+        return () => {
+          window.removeEventListener('resize', mark)
+          const fixtureWindow = window as Window & { __motionFixtureCleanups?: number }
+          fixtureWindow.__motionFixtureCleanups = (fixtureWindow.__motionFixtureCleanups ?? 0) + 1
+        }
+      })
+    </script>
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Test navigation">
+        <a href="/e2e-fixtures/motion">Motion fixture</a>
+        <a href="/e2e-fixtures/motion/destination">Known destination</a>
+      </nav>
+    </header>
+    <main>
+      <h1>Motion fixture home</h1>
+      <div data-motion="reveal">Reveal fixture stays readable</div>
+      <div data-motion="stagger">
+        <span>HTML stagger child</span>
+        <svg aria-label="SVG stagger child" role="img" viewBox="0 0 10 10">
+          <circle cx="5" cy="5" r="4"></circle>
+        </svg>
+      </div>
+      <h2 data-motion="text-reveal" class="fixture-text-reveal">
+        <span class="motion-word">Words</span>
+        <span class="motion-word">stay</span>
+        <span class="motion-word">readable</span>
+      </h2>
+      <div data-behavior="fixture-cleanup">Cleanup fixture</div>
+      <div data-motion="late-fixture">Late registration target</div>
+    </main>
+  </body>
+</html>

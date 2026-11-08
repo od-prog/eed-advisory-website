@@ -64,3 +64,28 @@ jobs:
       - name: Astro check (web)
         if: ${{ !cancelled() }}
         run: pnpm --filter web run check
+
+  motion-e2e:
+    name: Motion E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium and system dependencies
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run motion E2E suite
+        run: pnpm test:e2e
+      - name: Upload Playwright report and test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-motion-results
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore

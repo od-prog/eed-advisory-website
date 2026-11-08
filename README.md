@@ -37,6 +37,12 @@ Follow these steps to set up the project for local development:
 
 The CMS comes with a [seed script](https://github.com/jhb-software/payload-astro-website-template/blob/main/cms/src/seed.ts) to populate the database with some example data. To run it, uncomment the code inside the `onInit` function of your `payload.config.ts` file.
 
+### Motion E2E tests
+
+Run the deterministic motion browser suite from the repository root with `pnpm test:e2e`. Playwright starts Astro with test-only environment values; no `.env` file, CMS service, or production credentials are needed. The `/e2e-fixtures/motion` fixture and destination exist only in development and return 404 in production. They load the production motion modules and use Astro `ClientRouter` navigation.
+
+Install Chromium locally with `pnpm exec playwright install chromium`. To run in CI-like mode, use `CI=1 pnpm test:e2e` (PowerShell: `$env:CI = '1'; pnpm.cmd test:e2e`). The CI workflow installs Chromium and Linux system dependencies with `pnpm exec playwright install --with-deps chromium`. Coverage includes no-JavaScript and reduced-motion visibility, word layout, SVG stagger children, late registration, idempotent initialization, cross-page navigation, and Astro transition cleanup. Failed runs produce an HTML report in `playwright-report/` and results in `test-results/`.
+
 ### Customizing the Template
 
 When adapting this template for your project, consider the following steps:

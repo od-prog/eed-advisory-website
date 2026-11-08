@@ -10,14 +10,7 @@ type Props = {
   class?: string
 }
 
-const {
-  as = 'div',
-  direction = 'up',
-  distance = 24,
-  duration,
-  delay,
-  class: className,
-} = Astro.props
+const { as = 'div', direction = 'up', distance, duration, delay, class: className } = Astro.props
 
 const Tag = as
 ---
