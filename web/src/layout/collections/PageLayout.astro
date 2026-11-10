@@ -1,10 +1,12 @@
 ---
+import { websiteConfig } from '@/config'
 import { organizationSchema } from '@/schema/organization'
 import { pageSchema } from '@/schema/page'
 import { Schema } from 'astro-seo-schema'
 import type { Page } from 'cms/src/payload-types'
 import Section from '../../components/Section.astro'
 import HeroSection from '../../layout/HeroSection.astro'
+import Homepage from '../../layout/Homepage.astro'
 
 type Props = {
   page: Page
@@ -13,14 +15,49 @@ type Props = {
 const { page: pageData } = Astro.props
 const { locale } = Astro.locals.globalState
 const isRootPage = 'isRootPage' in pageData && Boolean(pageData.isRootPage)
+const legacyHomepageTitle =
+  pageData.hero.title === 'Welcome to Our Company' ||
+  pageData.hero.title === 'Willkommen bei unserem Unternehmen'
+const legacyHomepageSubtitle =
+  pageData.hero.subtitle === 'We provide innovative solutions for your digital challenges.' ||
+  pageData.hero.subtitle === 'Wir bieten innovative Lösungen für Ihre digitalen Herausforderungen.'
+const draftHero =
+  locale === 'de'
+    ? {
+        title: 'Energie, Wasser und Klima im Blick.',
+        subtitle:
+          'Ein Entwurf für die digitale Präsenz von EED Advisory. Inhalt und Positionierung werden mit EED abgestimmt.',
+      }
+    : {
+        title: 'A perspective on energy, water and climate.',
+        subtitle:
+          'A draft direction for the EED Advisory website. Content and positioning are subject to review by EED.',
+      }
 
 const schema = isRootPage ? organizationSchema() : pageSchema(pageData, locale)
 ---
 
-<HeroSection {...pageData.hero} breadcrumbs={pageData.breadcrumbs} />
-
-{pageData.sections?.map((section, index) => (
-  <Section {...section} withoutTopSpace={index === 0 && !pageData.isRootPage} />
-))}
+{isRootPage ? (
+  <>
+    <Homepage
+      locale={locale}
+      title={isRootPage && legacyHomepageTitle ? draftHero.title : pageData.hero.title}
+      subtitle={isRootPage && legacyHomepageSubtitle ? draftHero.subtitle : pageData.hero.subtitle}
+      posts={
+        pageData.sections
+          ?.flatMap((section) => section.blocks ?? [])
+          .find((block) => block.blockType === 'blog-posts')?.posts ?? []
+      }
+      contactUrl={websiteConfig.contactUrl}
+    />
+  </>
+) : (
+  <>
+    <HeroSection {...pageData.hero} breadcrumbs={pageData.breadcrumbs} />
+    {pageData.sections?.map((section, index) => (
+      <Section {...section} withoutTopSpace={index === 0} />
+    ))}
+  </>
+)}
 
 <Schema item={schema} />

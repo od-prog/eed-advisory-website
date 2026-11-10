@@ -35,7 +35,7 @@ import { generatePreviewToken } from './utils/previewToken'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-export const websiteName = 'Payload & Astro Website Template'
+export const websiteName = 'EED Advisory'
 
 export const collections: CollectionConfig[] = [
   // Pages Collections
@@ -122,7 +122,7 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || '',
   csrf:
     process.env.NODE_ENV === 'production'
-      ? ['https://cms.your-website.com']
+      ? [process.env.NEXT_PUBLIC_FRONTEND_URL].filter((url): url is string => Boolean(url))
       : ['http://localhost:3000'],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -145,7 +145,7 @@ export default buildConfig({
     afterOpenConnection: async (adapter) => attachDatabasePool(adapter.connection.getClient()),
   }),
   email: resendAdapter({
-    defaultFromAddress: 'cms@your-website.com',
+    defaultFromAddress: process.env.RESEND_FROM_ADDRESS || 'cms@localhost',
     defaultFromName: `${websiteName} CMS`,
     apiKey: process.env.RESEND_API_KEY!,
   }),
@@ -238,7 +238,7 @@ export default buildConfig({
       collections: {
         media: {
           // serve files directly from S3 object storage to improve performance.
-          // The frontend proxies these via /media/* with cache-control headers (see web/vercel.json).
+          // The frontend proxies these via /media/* with cache-control headers (see web/vercel.mjs).
           disablePayloadAccessControl: true,
           generateFileURL,
         },

@@ -4,13 +4,31 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, -apple-system;
-  --color-primary: #1e3a8a;
-  --color-primary-dark: #162d6e;
-  --color-neutral-150: #ededed;
+  --font-sans: 'Avenir Next', Avenir, Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --color-primary: #155c55;
+  --color-primary-dark: #103f3b;
+  --color-neutral-150: #e8e7dc;
+  --color-ink: #173532;
+  --color-paper: #f5f4ec;
+  --color-energy: #d78938;
+  --color-water: #438fa0;
+  --color-climate: #6b8b57;
 }
 
 :root {
+  /* Proposed EED palette and type system — review before production use. */
+  color-scheme: light;
+  --page-paper: #f5f4ec;
+  --page-ink: #173532;
+  --page-muted: #536560;
+  --page-line: #d8ddd3;
+  --brand-primary: #155c55;
+  --brand-primary-dark: #103f3b;
+  --brand-energy: #d78938;
+  --brand-water: #438fa0;
+  --brand-climate: #6b8b57;
+  --focus-ring: #a8432a;
   --motion-duration-fast: 180ms;
   --motion-duration-standard: 350ms;
   --motion-duration-slow: 650ms;
@@ -22,7 +40,22 @@
 @layer base {
   html {
     /* Scroll offset to account for the fixed header */
-    @apply scroll-pt-26 md:scroll-pt-22;
+    @apply scroll-pt-24 md:scroll-pt-20;
+    background: var(--page-paper);
+    color: var(--page-ink);
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--page-paper);
+    color: var(--page-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 4px;
   }
 
   h1,
@@ -33,15 +66,513 @@
 
 @layer components {
   .header-solid {
-    @apply bg-white;
+    background: var(--page-paper);
   }
 
   .header-scrolled {
-    @apply bg-white shadow-sm;
+    background: color-mix(in srgb, var(--page-paper) 94%, transparent);
+    box-shadow: 0 1px 0 var(--page-line);
+    backdrop-filter: blur(14px);
   }
 
   .header-transparent {
-    @apply bg-transparent;
+    background: transparent;
+  }
+
+  .eed-wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--page-ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+  }
+
+  .eed-wordmark img {
+    display: block;
+    height: 2.25rem;
+    width: 2.25rem;
+  }
+
+  .eed-header-focus-link,
+  .eed-mobile-focus-link {
+    color: var(--page-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .eed-mobile-focus-link {
+    display: block;
+    padding: 0.8rem 0;
+  }
+
+  .eed-home {
+    overflow: clip;
+  }
+
+  .eed-main-home {
+    padding: 0;
+  }
+
+  .eed-hero {
+    position: relative;
+    display: grid;
+    min-height: min(860px, 100svh);
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 6rem);
+    padding: clamp(8rem, 13vw, 12rem) max(1.25rem, calc((100vw - 76rem) / 2)) 7rem;
+    background:
+      radial-gradient(ellipse at 78% 46%, rgb(21 92 85 / 9%), transparent 37%),
+      linear-gradient(145deg, #f5f4ec 6%, #eeefe6 100%);
+  }
+
+  .eed-hero-copy {
+    position: relative;
+    z-index: 1;
+    max-width: 42rem;
+  }
+
+  .eed-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0 0 1.25rem;
+    color: var(--brand-primary-dark);
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .eed-status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--brand-energy);
+    box-shadow: 0 0 0 4px rgb(215 137 56 / 16%);
+  }
+
+  .eed-hero-title {
+    max-width: 11ch;
+    margin: 0;
+    color: var(--page-ink);
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7.1vw, 6.8rem);
+    font-weight: 500;
+    letter-spacing: -0.065em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .eed-hero-subtitle {
+    max-width: 38rem;
+    margin: 1.75rem 0 0;
+    color: var(--page-muted);
+    font-size: clamp(1.05rem, 1.7vw, 1.32rem);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .eed-review-note {
+    max-width: 36rem;
+    margin: 1rem 0 0;
+    color: #69736c;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .eed-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .eed-button {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.75rem 1.2rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+      background-color var(--motion-duration-fast) ease,
+      color var(--motion-duration-fast) ease;
+  }
+
+  .eed-button-primary {
+    background: var(--brand-primary-dark);
+    color: #fff;
+  }
+
+  .eed-button-primary:hover {
+    background: var(--brand-primary);
+  }
+
+  .eed-button-secondary {
+    border-color: var(--page-line);
+    color: var(--page-ink);
+  }
+
+  .eed-button-secondary:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary-dark);
+  }
+
+  .eed-hero-art {
+    position: relative;
+    width: min(100%, 37rem);
+    aspect-ratio: 1;
+    justify-self: center;
+    isolation: isolate;
+  }
+
+  .eed-hero-art::before,
+  .eed-hero-art::after {
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    content: '';
+  }
+
+  .eed-hero-art::before {
+    inset: 13%;
+    background: linear-gradient(140deg, #155c55 4%, #438fa0 55%, #d78938 100%);
+    opacity: 0.9;
+  }
+
+  .eed-hero-art::after {
+    inset: 24%;
+    background: #f5f4ec;
+    box-shadow: 0 0 4rem rgb(16 63 59 / 15%);
+  }
+
+  .eed-orbit {
+    position: absolute;
+    inset: 8%;
+    border: 1px solid rgb(21 92 85 / 40%);
+    border-radius: 50%;
+    transform: rotate(-35deg) scaleY(0.58);
+  }
+
+  .eed-orbit-two {
+    transform: rotate(35deg) scaleY(0.58);
+  }
+
+  .eed-orbit-three {
+    inset: 18%;
+    border-color: rgb(215 137 56 / 75%);
+    transform: rotate(90deg) scaleY(0.72);
+  }
+
+  .eed-orbit-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12%;
+    aspect-ratio: 1;
+    border: 0.65rem solid #f5f4ec;
+    border-radius: 50%;
+    background: var(--brand-primary-dark);
+    box-shadow: 0 0 0 1rem rgb(21 92 85 / 12%);
+    transform: translate(-50%, -50%);
+  }
+
+  .eed-art-label {
+    position: absolute;
+    color: var(--page-ink);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+  }
+
+  .eed-art-energy {
+    top: 18%;
+    right: 8%;
+  }
+  .eed-art-water {
+    right: 1%;
+    bottom: 30%;
+  }
+  .eed-art-climate {
+    bottom: 12%;
+    left: 13%;
+  }
+
+  .eed-scroll-cue {
+    position: absolute;
+    bottom: 2rem;
+    left: max(1.25rem, calc((100vw - 76rem) / 2));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--page-muted);
+    font-size: 0.75rem;
+    text-decoration: none;
+  }
+
+  .eed-scroll-cue span {
+    display: grid;
+    width: 1.8rem;
+    height: 1.8rem;
+    place-items: center;
+    border: 1px solid var(--page-line);
+    border-radius: 50%;
+  }
+
+  .eed-focus,
+  .eed-insights {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: clamp(5rem, 9vw, 8rem) 1.25rem;
+  }
+
+  .eed-section-heading {
+    max-width: 45rem;
+    margin: 0 auto 3rem;
+    text-align: center;
+  }
+
+  .eed-section-heading .eed-eyebrow,
+  .eed-insights-heading .eed-eyebrow {
+    justify-content: center;
+  }
+
+  .eed-section-heading h2,
+  .eed-insights-heading h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  .eed-section-heading > p:last-child {
+    margin: 1rem auto 0;
+    color: var(--page-muted);
+    line-height: 1.6;
+  }
+
+  .eed-area-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .eed-area-card {
+    position: relative;
+    display: flex;
+    min-height: 21rem;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+    border: 1px solid var(--page-line);
+    border-radius: 1.25rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: #fffefa;
+  }
+
+  .eed-area-number {
+    color: var(--page-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  .eed-area-symbol {
+    display: flex;
+    height: 4.5rem;
+    align-items: center;
+    gap: 0.38rem;
+    margin: 1rem 0 1.25rem;
+  }
+
+  .eed-area-symbol span {
+    width: 0.38rem;
+    height: 2rem;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.84;
+    transform: rotate(28deg);
+  }
+
+  .eed-area-symbol span:nth-child(2) {
+    height: 3rem;
+  }
+  .eed-area-symbol span:nth-child(3) {
+    height: 2.3rem;
+  }
+  .eed-area-energy .eed-area-symbol {
+    color: var(--brand-energy);
+  }
+  .eed-area-water .eed-area-symbol {
+    color: var(--brand-water);
+  }
+  .eed-area-climate .eed-area-symbol {
+    color: var(--brand-climate);
+  }
+
+  .eed-area-card h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+
+  .eed-area-card p {
+    max-width: 24rem;
+    margin: 0.75rem 0 2rem;
+    color: var(--page-muted);
+    line-height: 1.6;
+  }
+
+  .eed-area-rule {
+    position: absolute;
+    right: -1.5rem;
+    bottom: -2rem;
+    width: 9rem;
+    height: 5rem;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.32;
+    transform: rotate(-22deg);
+  }
+
+  .eed-area-energy .eed-area-rule {
+    color: var(--brand-energy);
+  }
+  .eed-area-water .eed-area-rule {
+    color: var(--brand-water);
+  }
+  .eed-area-climate .eed-area-rule {
+    color: var(--brand-climate);
+  }
+
+  .eed-insights {
+    max-width: none;
+    padding-right: max(1.25rem, calc((100vw - 76rem) / 2));
+    padding-left: max(1.25rem, calc((100vw - 76rem) / 2));
+    background: #e9eee7;
+  }
+
+  .eed-insights-heading {
+    margin-bottom: 2rem;
+  }
+
+  .eed-insights-heading .eed-eyebrow {
+    justify-content: flex-start;
+  }
+
+  .eed-insights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .eed-insight-card {
+    display: flex;
+    min-height: 16rem;
+    flex-direction: column;
+    align-items: flex-start;
+    border-top: 2px solid var(--brand-primary);
+    padding: 1.25rem 0;
+  }
+
+  .eed-insight-date {
+    color: var(--page-muted);
+    font-size: 0.78rem;
+  }
+
+  .eed-insight-card h3 {
+    margin: 0.75rem 0;
+    font-family: var(--font-display);
+    font-size: 1.65rem;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .eed-insight-card > p:last-of-type {
+    color: var(--page-muted);
+    line-height: 1.55;
+  }
+
+  .eed-insight-card a {
+    margin-top: auto;
+    color: var(--brand-primary-dark);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-underline-offset: 0.25em;
+  }
+
+  @media (max-width: 800px) {
+    .eed-hero {
+      min-height: auto;
+      grid-template-columns: minmax(0, 1fr) minmax(190px, 0.7fr);
+      gap: 1rem;
+      padding-bottom: 6rem;
+    }
+
+    .eed-hero-art {
+      width: 100%;
+    }
+    .eed-area-grid {
+      grid-template-columns: 1fr;
+    }
+    .eed-area-card {
+      min-height: 16rem;
+    }
+    .eed-insights-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .eed-hero {
+      grid-template-columns: 1fr;
+      padding-top: 8rem;
+    }
+
+    .eed-hero-title {
+      font-size: clamp(3.2rem, 16vw, 5.4rem);
+    }
+    .eed-hero-art {
+      width: min(85vw, 23rem);
+      margin: 0.5rem auto 1rem;
+    }
+    .eed-art-label {
+      font-size: 0.52rem;
+    }
+    .eed-scroll-cue {
+      bottom: 1rem;
+    }
+    .eed-insights-grid {
+      grid-template-columns: 1fr;
+    }
+    .eed-insight-card {
+      min-height: 13rem;
+    }
+    .eed-wordmark span {
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .eed-button {
+      transition: none;
+    }
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -102,6 +633,12 @@
   .menu-icon.active span:last-of-type {
     @apply bottom-[9px] left-0 w-full;
     transform: rotate(-45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 

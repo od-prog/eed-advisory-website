@@ -1,0 +1,180 @@
+---
+import type { Locale } from '@/cms/types'
+import Reveal from '@/components/motion/Reveal.astro'
+import TextReveal from '@/components/motion/TextReveal.astro'
+import type { Post } from 'cms/src/payload-types'
+
+type Props = {
+  locale: Locale
+  title: string
+  subtitle: string
+  posts?: (Post | string)[]
+  contactUrl?: string
+}
+
+const { locale, title, subtitle, posts = [], contactUrl } = Astro.props
+const publishedPosts = posts.filter(
+  (post): post is Post =>
+    typeof post === 'object' &&
+    Boolean(post && post.title && post.path && post.excerpt && post.updatedAt),
+)
+const isGerman = locale === 'de'
+const copy = isGerman
+  ? {
+      draft: 'Entwurf zur Prüfung durch EED',
+      note: 'Vorgeschlagene visuelle Richtung und Texte. Vor Veröffentlichung durch EED prüfen.',
+      focusEyebrow: 'Thematische Schwerpunkte · Entwurf',
+      focusTitle: 'Drei miteinander verbundene Themen.',
+      focusIntro: 'Vorgeschlagene Positionierung, vorbehaltlich der Prüfung durch EED.',
+      areas: [
+        {
+          number: '01',
+          title: 'Energie',
+          text: 'Entwurfspositionierung: Perspektiven für Entscheidungen im Energiesektor.',
+          tone: 'energy',
+        },
+        {
+          number: '02',
+          title: 'Wasser',
+          text: 'Entwurfspositionierung: Wasserressourcen und langfristige Resilienz.',
+          tone: 'water',
+        },
+        {
+          number: '03',
+          title: 'Klima',
+          text: 'Entwurfspositionierung: Klimaziele in umsetzbare Wege übersetzen.',
+          tone: 'climate',
+        },
+      ],
+      explore: 'Schwerpunkte entdecken',
+      contact: 'Kontakt aufnehmen',
+      insightsEyebrow: 'Einblicke',
+      insightsTitle: 'Aktuelle Perspektiven',
+      insightsLink: 'Beitrag lesen',
+    }
+  : {
+      draft: 'Draft for EED review',
+      note: 'Proposed visual direction and copy. EED review is required before publication.',
+      focusEyebrow: 'Thematic areas · draft',
+      focusTitle: 'Three connected areas of focus.',
+      focusIntro: 'Proposed positioning, subject to review by EED.',
+      areas: [
+        {
+          number: '01',
+          title: 'Energy',
+          text: 'Draft positioning: perspectives for decisions across the energy sector.',
+          tone: 'energy',
+        },
+        {
+          number: '02',
+          title: 'Water',
+          text: 'Draft positioning: water resources and long-term resilience.',
+          tone: 'water',
+        },
+        {
+          number: '03',
+          title: 'Climate',
+          text: 'Draft positioning: translating climate goals into practical pathways.',
+          tone: 'climate',
+        },
+      ],
+      explore: 'Explore our focus areas',
+      contact: 'Get in touch',
+      insightsEyebrow: 'Insights',
+      insightsTitle: 'Latest perspectives',
+      insightsLink: 'Read article',
+    }
+---
+
+---
+<div class="eed-home">
+  <section class="eed-hero" aria-labelledby="home-title">
+    <div class="eed-hero-copy">
+      <p class="eed-eyebrow">
+        <span class="eed-status-dot"></span>
+        {copy.draft}
+      </p>
+      <TextReveal as="h1" class="eed-hero-title" id="home-title">
+        {title}
+      </TextReveal>
+      <p class="eed-hero-subtitle">{subtitle}</p>
+      <p class="eed-review-note">{copy.note}</p>
+      <div class="eed-hero-actions">
+        <a class="eed-button eed-button-primary" href="#focus">
+          {copy.explore}
+          <span aria-hidden="true">↘</span>
+        </a>
+        {contactUrl && (
+          <a class="eed-button eed-button-secondary" href={contactUrl}>
+            {copy.contact}
+          </a>
+        )}
+      </div>
+    </div>
+    <div class="eed-hero-art" aria-hidden="true">
+      <div class="eed-orbit eed-orbit-one"></div>
+      <div class="eed-orbit eed-orbit-two"></div>
+      <div class="eed-orbit eed-orbit-three"></div>
+      <div class="eed-orbit-core"></div>
+      <span class="eed-art-label eed-art-energy">ENERGY</span>
+      <span class="eed-art-label eed-art-water">WATER</span>
+      <span class="eed-art-label eed-art-climate">CLIMATE</span>
+    </div>
+    <a class="eed-scroll-cue" href="#focus">
+      <span aria-hidden="true">↓</span>
+      {copy.explore}
+    </a>
+  </section>
+
+  <section class="eed-focus" id="focus" aria-labelledby="focus-title">
+    <div class="eed-section-heading">
+      <p class="eed-eyebrow">{copy.focusEyebrow}</p>
+      <h2 id="focus-title">{copy.focusTitle}</h2>
+      <p>{copy.focusIntro}</p>
+    </div>
+    <div class="eed-area-grid">
+      {copy.areas.map((area, index) => (
+        <Reveal as="article" class={`eed-area-card eed-area-${area.tone}`} delay={index * 90}>
+          <span class="eed-area-number">{area.number}</span>
+          <div class="eed-area-symbol" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <h3>{area.title}</h3>
+          <p>{area.text}</p>
+          <span class="eed-area-rule" aria-hidden="true"></span>
+        </Reveal>
+      ))}
+    </div>
+  </section>
+
+  {publishedPosts.length > 0 && (
+    <section class="eed-insights" id="insights" aria-labelledby="insights-title">
+      <div class="eed-insights-heading">
+        <div>
+          <p class="eed-eyebrow">{copy.insightsEyebrow}</p>
+          <h2 id="insights-title">{copy.insightsTitle}</h2>
+        </div>
+      </div>
+      <div class="eed-insights-grid">
+        {publishedPosts.slice(0, 3).map((post) => (
+          <article class="eed-insight-card">
+            <p class="eed-insight-date">
+              {new Date(post.updatedAt).toLocaleDateString(locale, {
+                year: 'numeric',
+                month: 'short',
+              })}
+            </p>
+            <h3>{post.title}</h3>
+            <p>{post.excerpt}</p>
+            <a href={post.path}>
+              {copy.insightsLink}
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+</div>

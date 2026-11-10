@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#F5F4EC"/>
+  <circle cx="926" cy="315" r="214" fill="#155C55"/>
+  <ellipse cx="926" cy="315" rx="265" ry="104" transform="rotate(-32 926 315)" stroke="#438FA0" stroke-width="2"/>
+  <ellipse cx="926" cy="315" rx="265" ry="104" transform="rotate(32 926 315)" stroke="#D78938" stroke-width="2"/>
+  <circle cx="926" cy="315" r="58" fill="#F5F4EC"/>
+  <circle cx="926" cy="315" r="26" fill="#103F3B"/>
+  <rect x="78" y="78" width="48" height="48" rx="15" fill="#103F3B"/>
+  <path d="M91 91h22v5h-17v5h14v5h-14v5h17v5H91V91Z" fill="#F5F4EC"/>
+  <circle cx="115" cy="90" r="3" fill="#D78938"/>
+  <text x="78" y="245" fill="#173532" font-family="Georgia,serif" font-size="78" letter-spacing="-4">EED Advisory</text>
+  <text x="82" y="305" fill="#536560" font-family="Arial,sans-serif" font-size="24" letter-spacing="3">ENERGY · WATER · CLIMATE</text>
+  <text x="82" y="550" fill="#536560" font-family="Arial,sans-serif" font-size="17">Proposed visual direction · for review</text>
+</svg>

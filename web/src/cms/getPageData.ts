@@ -15,6 +15,7 @@ export async function getPageData(
       collection: collection,
       locale,
       draft: options?.preview ? true : false,
+      depth: 2,
       where: {
         id: {
           equals: id,

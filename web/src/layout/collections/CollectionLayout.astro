@@ -21,9 +21,22 @@ const { pageProps, locale, preview } = Astro.props
 const pageData = await getPageData(pageProps.collection, pageProps.id, locale, {
   preview,
 })
+const isRootPage = pageProps.collection === 'pages' && Boolean((pageData as Page).isRootPage)
+const isTemplateHomepageMeta = ['Home', 'Startseite'].includes(pageData.meta.title ?? '')
+const pageMeta =
+  isRootPage && isTemplateHomepageMeta
+    ? {
+        ...pageData.meta,
+        title: locale === 'de' ? 'EED Advisory — Entwurf' : 'EED Advisory — Draft',
+        description:
+          locale === 'de'
+            ? 'Vorgeschlagene Website-Struktur für EED Advisory. Texte und visuelle Richtung sind Entwürfe zur Prüfung.'
+            : 'Proposed website structure for EED Advisory. Copy and visual direction are drafts for review.',
+      }
+    : pageData.meta
 ---
 
-<Layout lang={locale!} meta={pageData.meta}>
+<Layout lang={locale!} meta={pageMeta} home={isRootPage}>
   {preview && <LivePreviewRefreshPageScript />}
   {preview && <PreviewAdminToolbar pageProps={pageProps} />}
 

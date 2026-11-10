@@ -1,8 +1,10 @@
 // @ts-check
 import vercel from '@astrojs/vercel'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig, envField, fontProviders } from 'astro/config'
+import { defineConfig, envField } from 'astro/config'
 import { getRedirects } from './src/cms/getRedirects'
+
+const mediaOrigin = process.env.PUBLIC_MEDIA_ORIGIN
 
 export default defineConfig({
   redirects: await getRedirects(),
@@ -11,21 +13,23 @@ export default defineConfig({
   }),
   vite: {
     plugins: [tailwindcss()],
-    // Local dev proxy for /media/* - mirrors the Vercel rewrite in vercel.json
+    // Local dev proxy for /media/* - uses the same configured origin as Vercel.
     server: {
-      proxy: {
-        '/media': {
-          target: 'https://your-bucket.nbg1.your-objectstorage.com',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/media/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyRes', (proxyRes) => {
-              proxyRes.headers['cache-control'] =
-                'public, max-age=2592000, s-maxage=31536000, stale-while-revalidate=86400, immutable'
-            })
-          },
-        },
-      },
+      proxy: mediaOrigin
+        ? {
+            '/media': {
+              target: mediaOrigin,
+              changeOrigin: true,
+              rewrite: (path) => path.replace(/^\/media/, ''),
+              configure: (proxy) => {
+                proxy.on('proxyRes', (proxyRes) => {
+                  proxyRes.headers['cache-control'] =
+                    'public, max-age=2592000, s-maxage=31536000, stale-while-revalidate=86400, immutable'
+                })
+              },
+            },
+          }
+        : {},
     },
   },
   trailingSlash: 'never',
@@ -34,6 +38,16 @@ export default defineConfig({
       WEBSITE_URL: envField.string({
         context: 'client',
         access: 'public',
+      }),
+      PUBLIC_CONTACT_URL: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+      PUBLIC_ANALYTICS_DOMAIN: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
       }),
       CMS_URL: envField.string({
         context: 'client',
@@ -54,13 +68,4 @@ export default defineConfig({
       }),
     },
   },
-  fonts: [
-    {
-      provider: fontProviders.google(),
-      name: 'Montserrat',
-      cssVariable: '--font-montserrat',
-      weights: ['100 900'],
-      styles: ['normal'],
-    },
-  ],
 })

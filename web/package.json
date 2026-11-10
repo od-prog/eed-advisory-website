@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "JHB Payload Astro Website Template - Web",
+  "description": "EED Advisory website prototype",
   "license": "MIT",
   "type": "module",
   "scripts": {

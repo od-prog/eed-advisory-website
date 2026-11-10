@@ -1,10 +1,11 @@
-import { WEBSITE_URL } from 'astro:env/client'
+import { PUBLIC_ANALYTICS_DOMAIN, PUBLIC_CONTACT_URL, WEBSITE_URL } from 'astro:env/client'
 import type { Locale } from './cms/types'
 
 type WebsiteConfig = {
   url: string
   name: string
   domain: string
+  contactUrl: string
   icon: string
   logo: {
     path: string
@@ -19,16 +20,17 @@ type WebsiteConfig = {
 
 export const websiteConfig: WebsiteConfig = {
   url: WEBSITE_URL,
-  name: 'JHB Payload Astro Website Template',
-  domain: 'your-domain.com',
-  icon: '/icon.png',
+  name: 'EED Advisory',
+  domain: PUBLIC_ANALYTICS_DOMAIN ?? '',
+  contactUrl: PUBLIC_CONTACT_URL ?? '',
+  icon: '/icon.svg',
   logo: {
-    path: '/logo.webp',
-    url: new URL('/logo.webp', WEBSITE_URL).toString(),
+    path: '/eed-mark.svg',
+    url: new URL('/eed-mark.svg', WEBSITE_URL).toString(),
   },
   ogImage: {
-    path: (locale: Locale) => `/og_${locale}.png`,
-    url: (locale: Locale) => new URL(`/og_${locale}.png`, WEBSITE_URL).toString(),
+    path: (locale: Locale) => `/og_${locale}.svg`,
+    url: (locale: Locale) => new URL(`/og_${locale}.svg`, WEBSITE_URL).toString(),
   },
-  socialUrls: ['https://github.com', 'https://www.x.com', 'https://www.linkedin.com'],
+  socialUrls: [],
 }

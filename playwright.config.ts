@@ -14,7 +14,8 @@ export default defineConfig({
   ],
   outputDir: "test-results",
   webServer: {
-    command: "pnpm --filter web exec astro dev --host 127.0.0.1 --port 4322",
+    cwd: "web",
+    command: `"${process.execPath}" node_modules/astro/bin/astro.mjs dev --host 127.0.0.1 --port 4322`,
     url: "http://127.0.0.1:4322/e2e-fixtures/motion",
     reuseExistingServer: !isCI,
     timeout: 120_000,
