@@ -1,0 +1,86 @@
+---
+export const prerender = false
+
+if (!import.meta.env.DEV) return new Response(null, { status: 404 })
+
+import Homepage from '../../../layout/Homepage.astro'
+import '../../../styles.css'
+
+const locale = Astro.params.lang === 'de' ? 'de' : 'en'
+const title =
+  locale === 'de'
+    ? 'Eine Perspektive auf Energie, Wasser und Klima.'
+    : 'A perspective on energy, water and climate.'
+const subtitle =
+  locale === 'de'
+    ? 'Ein Entwurf für die Website von EED Advisory. Inhalt und Positionierung werden durch EED geprüft.'
+    : 'A draft direction for the EED Advisory website. Content and positioning are subject to review by EED.'
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>EED homepage prototype fixture</title>
+    <script>
+      import '../../../animations'
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">
+      {locale === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}
+    </a>
+    <header class="eed-fixture-header">
+      <a
+        class="eed-wordmark"
+        href="#main-content"
+        aria-label={locale === 'de' ? 'EED Advisory Startseite' : 'EED Advisory home'}
+      >
+        <img src="/eed-mark.svg" alt="" width="36" height="36" />
+        <span>EED Advisory</span>
+      </a>
+      <nav aria-label={locale === 'de' ? 'Hauptnavigation' : 'Main navigation'}>
+        <a href="#focus">{locale === 'de' ? 'Schwerpunkte' : 'Focus areas'}</a>
+      </nav>
+    </header>
+    <main id="main-content" class="eed-main-home">
+      <Homepage locale={locale} title={title} subtitle={subtitle} />
+    </main>
+  </body>
+</html>
+
+<style>
+  .eed-fixture-header {
+    position: absolute;
+    z-index: 40;
+    top: 0;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+  }
+
+  .eed-fixture-header nav a {
+    color: var(--page-ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .skip-link {
+    position: absolute;
+    z-index: 100;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #fffefa;
+    color: var(--page-ink);
+    transform: translateY(-150%);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+</style>

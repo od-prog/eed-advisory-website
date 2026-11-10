@@ -1,6 +1,5 @@
 ---
 import { websiteConfig } from '@/config'
-import { Font } from 'astro:assets'
 import { VERCEL_ENV } from 'astro:env/server'
 import { ClientRouter } from 'astro:transitions'
 import type { SeoMetadata } from 'cms/src/payload-types'
@@ -13,14 +12,15 @@ import SEOMetadata from './SEOMetadata.astro'
 type Props = {
   meta: SeoMetadata
   lang: string
+  home?: boolean
 }
 
-const { meta, lang } = Astro.props
+const { meta, lang, home = false } = Astro.props
 
 await initGlobalState(Astro)
 const { preview } = Astro.locals.globalState
 
-const enablePlausible = VERCEL_ENV === 'production' && !preview
+const enablePlausible = VERCEL_ENV === 'production' && !preview && Boolean(websiteConfig.domain)
 ---
 
 <!doctype html>
@@ -28,10 +28,7 @@ const enablePlausible = VERCEL_ENV === 'production' && !preview
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" href="/icon.svg" sizes="any" type="image/svg+xml" />
-
-    <Font cssVariable="--font-montserrat" preload />
+    <link rel="icon" href={websiteConfig.icon} sizes="any" type="image/svg+xml" />
 
     <SEOMetadata {...meta} />
 
@@ -58,7 +55,10 @@ const enablePlausible = VERCEL_ENV === 'production' && !preview
   </head>
   <body>
     <Header alternatePaths={meta.alternatePaths} />
-    <main class="py-32">
+    <a class="eed-skip-link" href="#main-content">
+      {lang === 'de' ? 'Zum Inhalt springen' : 'Skip to content'}
+    </a>
+    <main id="main-content" class:list={[home ? 'eed-main-home' : 'py-32']}>
       <slot />
     </main>
     <Footer />

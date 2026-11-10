@@ -24,13 +24,24 @@ const homePagePath = normalizePath(`/${locale ?? defaultLocale}`, preview)
   id="header"
   data-behavior="header"
 >
-  <a href={homePagePath} class="flex items-center gap-2 text-2xl font-bold">
-    {websiteConfig.name}
+  <a
+    href={homePagePath}
+    class="eed-wordmark"
+    aria-label={locale === 'de' ? 'EED Advisory Startseite' : 'EED Advisory home'}
+  >
+    <img src={websiteConfig.logo.path} alt="" width="36" height="36" />
+    <span>{websiteConfig.name}</span>
   </a>
 
   <div class="flex items-center gap-4">
-    <nav>
-      <ul class="hidden list-none gap-4 md:flex">
+    <nav
+      class="flex items-center gap-6"
+      aria-label={locale === 'de' ? 'Hauptnavigation' : 'Main navigation'}
+    >
+      <a class="eed-header-focus-link" href={`${homePagePath}#focus`}>
+        {locale === 'de' ? 'Schwerpunkte' : 'Focus areas'}
+      </a>
+      <ul class="hidden list-none items-center gap-4 md:flex">
         {header.links?.map((link) => (
           <li>
             <div class="flex flex-col gap-0.5">
@@ -88,11 +99,18 @@ const homePagePath = normalizePath(`/${locale ?? defaultLocale}`, preview)
 
 <section
   role="dialog"
+  aria-label={locale === 'de' ? 'Menü' : 'Menu'}
+  aria-modal="true"
   class:list={['fixed inset-0 z-50 hidden h-screen w-screen bg-white p-4']}
   id="navbar-modal"
 >
   <div class="flex h-full flex-col items-stretch justify-between">
     <ul class="flex flex-col gap-5">
+      <li>
+        <a class="eed-mobile-focus-link" href={`${homePagePath}#focus`}>
+          {locale === 'de' ? 'Schwerpunkte' : 'Focus areas'}
+        </a>
+      </li>
       {header.links?.map((link) => (
         <li>
           <Link path={(link.page as Page)?.path} class="w-full !text-lg">
